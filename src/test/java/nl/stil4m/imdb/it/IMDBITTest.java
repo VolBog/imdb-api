@@ -14,6 +14,7 @@ import nl.stil4m.imdb.exceptions.MovieDetailsException;
 import nl.stil4m.imdb.filter.MovieTypeFilter;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -194,6 +195,7 @@ public class IMDBITTest {
         assertThat(tvEpisodeDetails.getGenres(), is((List<String>) Lists.newArrayList("Talk-Show")));
     }
 
+    @Ignore("Date is country specific")
     @Test
     public void testFetchTvEpisodeInformation2() throws IMDBException {
 
