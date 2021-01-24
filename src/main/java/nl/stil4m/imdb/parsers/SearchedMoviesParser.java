@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SearchedMoviesParser implements Parser<List<SearchResult>> {
 
@@ -18,7 +19,7 @@ public class SearchedMoviesParser implements Parser<List<SearchResult>> {
     }
 
     @Override
-    public List<SearchResult> parse(Element document) throws ParseException {
+    public List<SearchResult> parse(Element document, Optional<Element> detailsDocument) throws ParseException {
         List<SearchResult> searchResultList = new ArrayList<>();
 
         Element element = getSearchResultsFromDocument(document);
@@ -29,7 +30,7 @@ public class SearchedMoviesParser implements Parser<List<SearchResult>> {
         Elements results = getSearchResults(element);
         try {
             for (Element result : results) {
-                SearchResult searchResult = movieFindResultParser.parse(result);
+                SearchResult searchResult = movieFindResultParser.parse(result, Optional.empty());
                 searchResultList.add(searchResult);
             }
         } catch (ParseException e) {

@@ -4,6 +4,9 @@ on:
   push:
     branches: 
       - '**' # matches every branch
+    schedule:
+      # * is a special character in YAML so you have to quote this string
+      - cron: '* 10 * * 0'
 jobs:
   app:
     runs-on: ubuntu-latest

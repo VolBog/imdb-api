@@ -6,10 +6,7 @@ import org.jsoup.nodes.Element;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
@@ -28,7 +25,7 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
     }
 
     @Override
-    public TvEpisodeDetails parse(Element document) {
+    public TvEpisodeDetails parse(Element document, Optional<Element> detailsDocument) {
         String showName = getShowName(document);
         String episodeName = getEpisodeName(document);
         Long seasonNumber = getSeasonNumber(document);
@@ -52,11 +49,11 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
         if(dateString.length() == 4) {
             return LocalDate.of(Integer.parseInt(dateString), 1, 1);
         }
-        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
     }
 
     private List<String> getGenres(Element document) {
-        String genreString = document.select(properties.get(GENRES).toString()).text().split(Pattern.quote("|"))[0].trim();
+        String genreString = document.select(properties.get(GENRES).toString()).text().trim().replace(" Add a plot", "");
         List<String> answer = new ArrayList<>();
         for (String genre : genreString.split(", ")) {
             answer.add(genre.trim());
@@ -65,15 +62,13 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
     }
 
     private Long getEpisodeNumber(Element document) {
-        String episodeInfoText = document.select(properties.get(EPISODE_NUMBER).toString()).text();
-        String episodeInfo = episodeInfoText.split(Pattern.quote("|"))[1];
-        return Long.parseLong(episodeInfo.replace("Episode", "").trim());
+        String episodeInfo = document.select(properties.get(EPISODE_NUMBER).toString()).text();
+        return Long.parseLong(episodeInfo.replace("E", "").trim());
     }
 
     private Long getSeasonNumber(Element document) {
-        String episodeInfoText = document.select(properties.get(SEASON_NUMBER).toString()).text();
-        String seasonInfo = episodeInfoText.split(Pattern.quote("|"))[0];
-        return Long.parseLong(seasonInfo.replace("Season", "").trim());
+        String seasonInfo = document.select(properties.get(SEASON_NUMBER).toString()).text();
+        return Long.parseLong(seasonInfo.replace("S", "").trim());
     }
 
     private String getEpisodeName(Element document) {
