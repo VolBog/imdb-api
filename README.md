@@ -1,4 +1,5 @@
-Travis says: <img src="https://api.travis-ci.org/stil4m/imdb-api.png" />
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Tests](https://github.com/jimmyd-be/imdb-api/workflows/Tests/badge.svg)
 
 # IMDb API
 
