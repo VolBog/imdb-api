@@ -1,6 +1,7 @@
 package nl.stil4m.imdb;
 
 import nl.stil4m.imdb.commands.SearchTitleCommand;
+import nl.stil4m.imdb.commands.TitleCommand;
 import nl.stil4m.imdb.commands.TitleDetailsCommand;
 import nl.stil4m.imdb.domain.MovieDetails;
 import nl.stil4m.imdb.domain.SearchResult;
@@ -21,6 +22,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class IMDB {
@@ -42,7 +44,7 @@ public class IMDB {
     public List<SearchResult> search(String query) throws IMDBException {
         try {
             Document doc = documentBuilder.buildDocument(new SearchTitleCommand(query));
-            return searchedMoviesParser.parse(doc);
+            return searchedMoviesParser.parse(doc, Optional.empty());
         } catch (IOException e) {
             throw new IMDBException("Could not find movies for name '" + query + "'", e);
         } catch (ParseException e) {
@@ -59,8 +61,9 @@ public class IMDB {
 
     public MovieDetails getMovieDetails(String movieId) throws IMDBException {
         try {
-            Document doc = documentBuilder.buildDocument(new TitleDetailsCommand(movieId));
-            return movieDetailsPageParser.parse(doc);
+            Document doc = documentBuilder.buildDocument(new TitleCommand(movieId));
+            Document detailsDoc = documentBuilder.buildDocument(new TitleDetailsCommand(movieId));
+            return movieDetailsPageParser.parse(doc, Optional.of(detailsDoc));
         } catch (Exception e) {
             throw new MovieDetailsException("Could not find movie details for id: '" + movieId + "'", e);
         }
@@ -68,8 +71,9 @@ public class IMDB {
 
     public TvEpisodeDetails getTvEpisodeDetails(String episodeId) throws IMDBException {
         try {
-            Document doc = documentBuilder.buildDocument(new TitleDetailsCommand(episodeId));
-            return tvEpisodeDetailsPageParser.parse(doc);
+            Document doc = documentBuilder.buildDocument(new TitleCommand(episodeId));
+            Document detailsDoc = documentBuilder.buildDocument(new TitleDetailsCommand(episodeId));
+            return tvEpisodeDetailsPageParser.parse(doc, Optional.of(detailsDoc));
         } catch (Exception e) {
             throw new TvEpisodeDetailsException("Could not find episode details for id: '" + episodeId + "'", e);
         }
@@ -77,8 +81,9 @@ public class IMDB {
 
     public TvShowDetails getTvShowDetails(String showId) throws IMDBException {
         try {
-            Document doc = documentBuilder.buildDocument(new TitleDetailsCommand(showId));
-            return tvShowDetailsPageParser.parse(doc);
+            Document doc = documentBuilder.buildDocument(new TitleCommand(showId));
+            Document detailsDoc = documentBuilder.buildDocument(new TitleDetailsCommand(showId));
+            return tvShowDetailsPageParser.parse(doc, Optional.of(detailsDoc));
         } catch (Exception e) {
             throw new TvShowDetailsException("Could not find show details for id: '" + showId + "'", e);
         }

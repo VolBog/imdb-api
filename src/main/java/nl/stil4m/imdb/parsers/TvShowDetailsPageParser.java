@@ -6,11 +6,10 @@ import nl.stil4m.imdb.util.ElementUtil;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class TvShowDetailsPageParser implements Parser<TvShowDetails> {
 
@@ -23,7 +22,7 @@ public class TvShowDetailsPageParser implements Parser<TvShowDetails> {
     private static final String RATING = "TvShowDetailsPageParser.rating";
 
     private static final char separatorChar = 8211;
-    private static final Pattern YEAR_PATTERN = Pattern.compile("\\(([0-9]{4})" + separatorChar + "([0-9]{4}| )\\)");
+    private static final Pattern YEAR_PATTERN = Pattern.compile("\\d{4}");
 
     private final Properties properties;
     private final ElementUtil elementUtil;
@@ -34,54 +33,52 @@ public class TvShowDetailsPageParser implements Parser<TvShowDetails> {
     }
 
     @Override
-    public TvShowDetails parse(Element document) {
+    public TvShowDetails parse(Element document, Optional<Element> detailsDocument) {
         String plot = getPlot(document);
         String name = getName(document);
         Double rating = getRating(document);
         Integer startYear = getStartYear(document);
         Integer endYear = getEndYear(document);
-        Integer duration = getDuration(document);
+        //Integer duration = getDuration(document);
         Set<String> genres = getGenres(document);
-        Set<String> creators = getCreators(document);
-        return new TvShowDetails(name, rating, startYear, endYear, duration, genres, plot, creators);
+        Set<String> creators = getCreators(detailsDocument.get());
+        return new TvShowDetails(name, rating, startYear, endYear, genres, plot, creators);
     }
 
     private Set<String> getCreators(Element document) {
-        return elementUtil.allTextForElementsSet(
-                document.select(properties.get(CREATORS).toString())
-        );
+        Set<String> writers = new HashSet<>();
+        document.select(properties.get(CREATORS).toString()).next().select("tbody").forEach(element -> {
+            element.children().select("td.name").forEach(element1 ->  writers.add(element1.text()));
+        });
+
+        return writers;
     }
 
     private Set<String> getGenres(Element document) {
-        String genreString = document.select(properties.get(GENRES).toString()).text().split(Pattern.quote("|"))[1].trim();
-        Set<String> answer = new HashSet<>();
-        for (String genre : genreString.split(",")) {
-            answer.add(genre.trim());
-        }
-        return answer;
-    }
-
-    private Integer getDuration(Element document) {
-        return Integer.parseInt(document.select(properties.get(DURATION).toString()).text().split(Pattern.quote("|"))[0].replace("min", "").trim());
+        List<String> answer = new ArrayList<>();
+        Collections.addAll(answer, document.select(properties.get(GENRES).toString()).text().split("(?=\\p{Upper})"));
+        return answer.stream().map(n -> n.trim()).collect(Collectors.toSet());
     }
 
     private Integer getEndYear(Element document) {
         String yearString = document.select(properties.get(YEAR).toString()).text();
         Matcher matcher = YEAR_PATTERN.matcher(yearString);
         matcher.find();
-        if (matcher.group(2).equals(" ")) {
+        matcher.find();
+
+        String endYear = matcher.group();
+        if (endYear.equals(" ")) {
             return -1;
         }
-        return Integer.parseInt(matcher.group(2));
+        return Integer.parseInt(endYear);
     }
 
     private Integer getStartYear(Element document) {
-        final String subtitle = document.select(properties.get(YEAR).toString()).text();
+        final String yearString = document.select(properties.get(YEAR).toString()).text();
 
-        String yearString = subtitle.split(Pattern.quote("|"))[2];
         Matcher matcher = YEAR_PATTERN.matcher(yearString);
         matcher.find();
-        return Integer.parseInt(matcher.group(1));
+        return Integer.parseInt(matcher.group());
     }
 
     private Double getRating(Element document) {

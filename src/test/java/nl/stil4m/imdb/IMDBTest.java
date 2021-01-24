@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 
 import nl.stil4m.imdb.commands.Command;
 import nl.stil4m.imdb.commands.SearchTitleCommand;
+import nl.stil4m.imdb.commands.TitleCommand;
 import nl.stil4m.imdb.commands.TitleDetailsCommand;
 import nl.stil4m.imdb.domain.MovieDetails;
 import nl.stil4m.imdb.domain.SearchResult;
@@ -16,6 +17,7 @@ import nl.stil4m.imdb.parsers.TvEpisodeDetailsPageParser;
 import nl.stil4m.imdb.parsers.TvShowDetailsPageParser;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,11 +27,14 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,6 +62,9 @@ public class IMDBTest {
     @Mock
     private Document document;
 
+    @Mock
+    private Document detailsDocument;
+
     @Captor
     private ArgumentCaptor<Command> commandCaptor;
 
@@ -70,7 +78,7 @@ public class IMDBTest {
     public void testSearch() throws IMDBException, IOException, ParseException {
         List<SearchResult> answer = Lists.newArrayList(mock(SearchResult.class), mock(SearchResult.class), mock(SearchResult.class));
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
-        when(searchedMoviesParser.parse(document)).thenReturn(answer);
+        when(searchedMoviesParser.parse(document, Optional.empty())).thenReturn(answer);
         List<SearchResult> result = imdb.search("someQuery");
 
         verify(documentBuilder).buildDocument(commandCaptor.capture());
@@ -91,7 +99,7 @@ public class IMDBTest {
 
         List<SearchResult> answer = Lists.newArrayList(first, second);
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
-        when(searchedMoviesParser.parse(document)).thenReturn(answer);
+        when(searchedMoviesParser.parse(document, Optional.empty())).thenReturn(answer);
 
         List<SearchResult> result = imdb.search("someQuery", predicate);
 
@@ -115,7 +123,8 @@ public class IMDBTest {
 
     @Test
     public void testSearchWithParseException() throws IOException {
-        doThrow(ParseException.class).when(documentBuilder).buildDocument(isA(Command.class));
+        given(documentBuilder.buildDocument(isA(Command.class))).willAnswer( invocation -> { throw new ParseException(""); });
+        
         try {
             imdb.search("someQuery");
             fail();
@@ -129,11 +138,13 @@ public class IMDBTest {
     public void testGetMovieDetails() throws IOException, IMDBException {
         MovieDetails answer = mock(MovieDetails.class);
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
-        when(movieDetailsPageParser.parse(document)).thenReturn(answer);
+        when(documentBuilder.buildDocument(isA(TitleDetailsCommand.class))).thenReturn(detailsDocument);
+
+        when(movieDetailsPageParser.parse(document, Optional.of(detailsDocument))).thenReturn(answer);
 
         MovieDetails result = imdb.getMovieDetails("someId");
 
-        verify(documentBuilder).buildDocument(commandCaptor.capture());
+        verify(documentBuilder, times(2)).buildDocument(commandCaptor.capture());
 
         assertThat(commandCaptor.getValue() instanceof TitleDetailsCommand, is(true));
         assertThat(((TitleDetailsCommand) commandCaptor.getValue()).getId(), is("someId"));

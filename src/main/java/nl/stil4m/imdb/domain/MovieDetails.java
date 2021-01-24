@@ -10,6 +10,7 @@ import java.util.List;
 public class MovieDetails {
 
     private final String movieName;
+    private final String movieOriginalName;
     private final Integer year;
     private final String description;
     private final Double rating;

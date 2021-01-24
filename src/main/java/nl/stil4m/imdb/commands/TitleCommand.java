@@ -2,11 +2,11 @@ package nl.stil4m.imdb.commands;
 
 import java.io.UnsupportedEncodingException;
 
-public class TitleDetailsCommand implements Command {
+public class TitleCommand implements Command {
 
     private final String id;
 
-    public TitleDetailsCommand(String id) {
+    public TitleCommand(String id) {
         this.id = id;
     }
 
@@ -16,7 +16,7 @@ public class TitleDetailsCommand implements Command {
 
     @Override
     public String getUrlExtension() throws UnsupportedEncodingException {
-        return "/title/" + id + "/fullcredits";
+        return "/title/" + id;
     }
 
 }

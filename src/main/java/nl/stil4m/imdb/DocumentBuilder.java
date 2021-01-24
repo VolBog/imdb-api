@@ -12,7 +12,8 @@ public class DocumentBuilder {
 
     public Document buildDocument(Command command) throws IOException {
         String string = IMDBConstants.ROOT_URL + command.getUrlExtension();
-        return Jsoup.connect(string).timeout(30000).get();
+        return Jsoup.connect(string)
+                .cookie("beta-control", "tmd=in").timeout(30000).get();
     }
 
 }

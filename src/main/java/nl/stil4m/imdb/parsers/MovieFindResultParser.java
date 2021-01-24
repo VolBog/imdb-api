@@ -6,10 +6,12 @@ import nl.stil4m.imdb.exceptions.ParseException;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Optional;
+
 public class MovieFindResultParser implements Parser<SearchResult> {
 
     @Override
-    public SearchResult parse(Element document) throws ParseException {
+    public SearchResult parse(Element document, Optional<Element> detailsDocument) throws ParseException {
         SearchResult.SearchResultBuilder builder = SearchResult.builder();
 
         String thumbnail = getPhotoResult(document);

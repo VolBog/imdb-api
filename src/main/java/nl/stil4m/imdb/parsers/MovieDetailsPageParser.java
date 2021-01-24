@@ -22,6 +22,7 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     private static final String NAME_TITLE_HEADER = "MovieDetailsPageParser.nameTitleHeader";
     private static final String NAME_TITLE_EXTRA = "MovieDetailsPageParser.nameTitleExtra";
     private static final String NAME_TITLE_NORMAL = "MovieDetailsPageParser.nameTitleNormal";
+    private static final String NAME_TITLE_ORIGINAL = "MovieDetailsPageParser.nameTitleOriginal";
     private static final String STARS = "MovieDetailsPageParser.stars";
     private static final String DURATION = "MovieDetailsPageParser.duration";
 
@@ -35,24 +36,27 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     @Override
-    public MovieDetails parse(Element document) {
+    public MovieDetails parse(Element document, Optional<Element> detailsDocument) {
         String movieName = parseMovieName(document);
+        String movieOriginalName = parseMovieOriginalName(document);
         Integer year = parseMovieYear(document);
         String description = parseDescription(document);
         Double rating = parseRating(document);
-        List<String> directors = parseDirectors(document);
-        List<String> writers = parseWriters(document);
-        List<String> stars = parseStars(document);
+        List<String> directors = parseDirectors(detailsDocument.get());
+        List<String> writers = parseWriters(detailsDocument.get());
+        List<String> stars = parseStars(detailsDocument.get());
         List<String> categories = parseCategories(document);
         String image = parseImage(document);
         Integer duration = parseDuration(document);
-        return new MovieDetails(movieName, year, description, rating, directors, writers, stars, categories, image,duration);
+        return new MovieDetails(movieName, movieOriginalName, year, description, rating, directors, writers, stars, categories, image,duration);
+    }
+
+    private String parseMovieOriginalName(Element document) {
+        return document.select(properties.get(NAME_TITLE_ORIGINAL).toString()).text().replace("Original title: ", "");
     }
 
     private Integer parseDuration(Element document) {
-        String header = document.select(properties.get(DURATION).toString()).text();
-
-        String durationString = header.split(Pattern.quote("|"))[1].trim();
+        String durationString = document.select(properties.get(DURATION).toString()).text();
 
         int duration = 0;
 
@@ -71,12 +75,12 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     private String parseImage(Element document) {
-        return document.select(properties.get(IMAGE).toString()).attr("src");
+        return document.select(properties.get(IMAGE).toString()).select("img").attr("src");
     }
 
     private List<String> parseCategories(Element document) {
         List<String> answer = new ArrayList<>();
-        Collections.addAll(answer, document.select(properties.get(CATEGORIES).toString()).text().trim().split(Pattern.quote("|"))[2].split(", "));
+        Collections.addAll(answer, document.select(properties.get(CATEGORIES).toString()).text().split("(?=\\p{Upper})"));
         return answer.stream().map(n -> n.trim()).collect(Collectors.toList());
     }
 
@@ -95,23 +99,34 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
 
     private List<String> parseWriters(Element document) {
 
-        String stars = document.select(properties.get(WRITERS).toString()).text()
-                .replace("Writers: ", "").replace("Writer: ", "").trim().split(Pattern.quote("|"))[0];
-        return Arrays.asList(stars.split(", ")).stream().map(n -> n.contains("(") ? n.substring(0, n.indexOf("(")).trim() : n).collect(Collectors.toList());
+        List<String> writers = new ArrayList<>();
+        document.select(properties.get(WRITERS).toString()).next().select("tbody").forEach(element -> {
+            element.children().select("td.name").forEach(element1 ->  writers.add(element1.text()));
+        });
+
+        return writers;
     }
 
     private List<String> parseDirectors(Element document) {
-        return elementUtil.allTextForElements(document.select(properties.get(DIRECTORS).toString()));
+
+        List<String> directors = new ArrayList<>();
+
+        document.select(properties.get(DIRECTORS).toString()).next().select("tbody").forEach(element -> {
+            element.children().select("td.name").forEach(element1 ->  directors.add(element1.text()));
+        });
+
+        return directors;
     }
 
     private List<String> parseStars(Element document) {
-        try {
-            String stars = document.select(properties.get(STARS).toString()).text().replace("Stars: ", "").trim().split(Pattern.quote("|"))[0];
-            return Arrays.asList(stars.split(", ").clone());
-        }
-        catch (Exception ex) {
-            return new ArrayList<>();
-        }
+
+        List<String> stars = new ArrayList<>();
+
+        document.select(properties.get(STARS).toString()).next().select("tbody").forEach(element -> {
+            element.children().select("td").not("td.character").not("td.ellipsis").forEach(element1 ->  stars.add(element1.text()));
+        });
+
+        return stars.stream().map(n -> n.trim()).filter(n -> !n.isEmpty()).collect(Collectors.toList());
     }
 
     private String parseMovieName(Element document) {
