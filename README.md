@@ -8,7 +8,7 @@ This is a Java library which can be used to extract little pieces of information
 You have to create a instance of the `IMDB` type. For standard usage, you should do this by using the `IMDBFactory`. The sample code shows this:
 
 ```
-InputStream inputStream = getClass().getResourceAsStream("/nl/stil4m/imdb/parsing.properties");
+InputStream inputStream = getClass().getResourceAsStream("/io/github/jimmydbe/imdb/parsing.properties");
 Properties properties = new Properties();
 properties.load(inputStream);
 IMDBFactory factory = new IMDBFactory();
