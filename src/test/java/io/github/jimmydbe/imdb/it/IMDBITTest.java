@@ -52,7 +52,7 @@ public class IMDBITTest {
 
         List<SearchResult> resultList = imdb.search("inglourious basterds");
 
-        assertThat(resultList.size(), is(19));
+        assertThat(resultList.size(), is(21));
         assertThat(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2009, "Movie", "https://m.media-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_UX32_CR0,0,32,44_AL_.jpg")), is(true));
         assertThat(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2009, "Abc", "")), is(false));
         assertThat(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2008, "Movie", "")), is(false));
@@ -114,7 +114,7 @@ public class IMDBITTest {
         assertThat(movieDetails.getWriters(), is((List<String>) Lists.newArrayList("Quentin Tarantino")));
         assertThat(movieDetails.getStars().contains("Brad Pitt"), is(true));
         assertThat(movieDetails.getCategories(), is((List<String>) Lists.newArrayList("Adventure", "Drama", "War")));
-        assertThat(movieDetails.getImage(), is("https://m.media-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_UX190_CR0,0,190,281_.jpg"));
+        assertThat(movieDetails.getImage(), is("https://m.media-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_QL75_UX190_CR0,0,190,281_.jpg"));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class IMDBITTest {
         assertThat(tvShowDetails.getStartYear(), is(2011));
         assertThat(tvShowDetails.getEndYear(), is(2019));
         assertThat(tvShowDetails.getPlot(), is("Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia."));
-        assertThat(tvShowDetails.getRating(), is(9.3));
+        assertThat(tvShowDetails.getRating(), is(9.2));
         assertThat(tvShowDetails.getGenres(), is((Set<String>) Sets.newHashSet("Action", "Drama", "Adventure")));
         assertTrue(tvShowDetails.getCreators().contains("David Benioff"));
         assertTrue(tvShowDetails.getCreators().contains("D.B. Weiss"));

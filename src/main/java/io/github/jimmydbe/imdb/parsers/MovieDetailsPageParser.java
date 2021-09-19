@@ -56,6 +56,8 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     private Integer parseDuration(Element document) {
         String durationString = document.select(properties.get(DURATION).toString()).text();
 
+        durationString = durationString.replace("Runtime ", "");
+
         int duration = 0;
 
         if (durationString.contains("h")) {
@@ -87,9 +89,11 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     private Double parseRating(Element document) {
-        Elements elements = document.select(properties.get(RATING).toString());
-        if (elements.text().trim().length() > 0) {
-            return Double.parseDouble(elements.text());
+        //Elements elements = document.select(properties.get(RATING).toString());
+        Elements elements = document.select(".AggregateRatingButton__ContentWrap-sc-1ll29m0-0");
+        String value = elements.get(0).text().trim();
+        if (value.length() > 0) {
+            return Double.parseDouble(value.substring(0, value.indexOf("/")));
         } else {
             return null;
         }
