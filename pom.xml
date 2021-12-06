@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.jimmyd-be</groupId>
     <artifactId>imdb-api</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 
     <name>IMDb API</name>
-    <description>This is a Java library which can be used to extract little pieces of information of the IMDb.</description>
+    <description>This is a Java library which can be used to extract little pieces of information of the IMDb.
+    </description>
     <url>https://github.com/jimmyd-be/imdb-api</url>
 
     <scm>

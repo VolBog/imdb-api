@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: 
+    branches:
       - '**' # matches every branch
     pull_request:
       branches: [ master ]

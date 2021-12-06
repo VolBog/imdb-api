@@ -40,9 +40,9 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
         Integer year = parseMovieYear(document);
         String description = parseDescription(document);
         Double rating = parseRating(document);
-        List<String> directors = parseDirectors(detailsDocument.get());
-        List<String> writers = parseWriters(detailsDocument.get());
-        List<String> stars = parseStars(detailsDocument.get());
+        List<String> directors = detailsDocument.map(this::parseDirectors).orElse(new ArrayList<>());
+        List<String> writers = detailsDocument.map(this::parseWriters).orElse(new ArrayList<>());
+        List<String> stars = detailsDocument.map(this::parseStars).orElse(new ArrayList<>());
         List<String> categories = parseCategories(document);
         String image = parseImage(document);
         Integer duration = parseDuration(document);
@@ -60,12 +60,23 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
 
         int duration = 0;
 
-        if (durationString.contains("h")) {
-            final String hours = durationString.substring(0, durationString.indexOf("h"));
+        if (durationString.contains("hours") || durationString.contains("hour")) {
+            final String hours = durationString.substring(0, durationString.indexOf("h")).trim();
             duration += Integer.parseInt(hours) * 60;
+            durationString = durationString.substring(durationString.indexOf("h") + 5).trim();
+        } else if (durationString.contains("h")) {
+            final String hours = durationString.substring(0, durationString.indexOf("h")).trim();
+            duration += Integer.parseInt(hours) * 60;
+            durationString = durationString.substring(durationString.indexOf("h")).trim();
         }
 
-        if (durationString.contains("min")) {
+        if (durationString.contains("minutes")) {
+            final String minutes = durationString.replace("minutes", "").trim();
+            duration += Integer.parseInt(minutes);
+        } else if (durationString.contains("minute")) {
+            final String minutes = durationString.replace("minute", "").trim();
+            duration += Integer.parseInt(minutes);
+        } else if (durationString.contains("min")) {
             int startPosition = durationString.indexOf(" ") != -1 ? durationString.indexOf(" ") : 0;
 
             duration += Integer.parseInt(durationString.substring(startPosition, durationString.length() - 3).trim());
@@ -81,7 +92,7 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     private List<String> parseCategories(Element document) {
         List<String> answer = new ArrayList<>();
         Collections.addAll(answer, document.select(properties.get(CATEGORIES).toString()).text().split("(?=\\p{Upper})"));
-        return answer.stream().map(n -> n.trim()).collect(Collectors.toList());
+        return answer.stream().map(String::trim).collect(Collectors.toList());
     }
 
     private String parseDescription(Element document) {
@@ -100,17 +111,14 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     private List<String> parseWriters(Element document) {
-
         List<String> writers = new ArrayList<>();
-        document.select(properties.get(WRITERS).toString()).next().select("tbody").forEach(element -> {
-            element.children().select("td.name").forEach(element1 -> writers.add(element1.text()));
-        });
+        document.select(properties.get(WRITERS).toString()).next().select("tbody").forEach(element ->
+                element.children().select("td.name").forEach(element1 -> writers.add(element1.text())));
 
         return writers;
     }
 
     private List<String> parseDirectors(Element document) {
-
         List<String> directors = new ArrayList<>();
 
         document.select(properties.get(DIRECTORS).toString()).next().select("tbody").forEach(element -> {
@@ -121,14 +129,13 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     private List<String> parseStars(Element document) {
-
         List<String> stars = new ArrayList<>();
 
         document.select(properties.get(STARS).toString()).next().select("tbody").forEach(element -> {
             element.children().select("td").not("td.character").not("td.ellipsis").forEach(element1 -> stars.add(element1.text()));
         });
 
-        return stars.stream().map(n -> n.trim()).filter(n -> !n.isEmpty()).collect(Collectors.toList());
+        return stars.stream().map(String::trim).filter(n -> !n.isEmpty()).collect(Collectors.toList());
     }
 
     private String parseMovieName(Element document) {
