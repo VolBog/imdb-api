@@ -1,9 +1,8 @@
 package io.github.jimmydbe.imdb.exceptions;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class TvShowDetailsExceptionTest {
@@ -12,7 +11,7 @@ public class TvShowDetailsExceptionTest {
     public void testConstructor() {
         Throwable throwable = mock(Throwable.class);
         TvShowDetailsException tvShowDetailsException = new TvShowDetailsException("Message", throwable);
-        assertThat(tvShowDetailsException.getMessage(), is("Message"));
-        assertThat(tvShowDetailsException.getCause(), is(throwable));
+        Assertions.assertEquals("Message", tvShowDetailsException.getMessage());
+        Assertions.assertEquals(throwable, tvShowDetailsException.getCause());
     }
 }

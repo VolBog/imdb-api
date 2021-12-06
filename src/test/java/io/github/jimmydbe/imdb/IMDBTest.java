@@ -14,27 +14,30 @@ import io.github.jimmydbe.imdb.parsers.SearchedMoviesParser;
 import io.github.jimmydbe.imdb.parsers.TvEpisodeDetailsPageParser;
 import io.github.jimmydbe.imdb.parsers.TvShowDetailsPageParser;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.Assert.fail;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class IMDBTest {
-
-    private IMDB imdb;
 
     @Mock
     private DocumentBuilder documentBuilder;
@@ -60,13 +63,10 @@ public class IMDBTest {
     @Captor
     private ArgumentCaptor<Command> commandCaptor;
 
-    @Before
-    public void before() {
-        MockitoAnnotations.initMocks(this);
-        imdb = new IMDB(documentBuilder, searchedMoviesParser, movieDetailsPageParser, tvShowDetailsPageParser, tvEpisodeDetailsPageParser);
-    }
+    @InjectMocks
+    private IMDB imdb;
 
-    @org.junit.Test
+    @Test
     public void testSearch() throws IMDBException, IOException, ParseException {
         List<SearchResult> answer = Lists.newArrayList(mock(SearchResult.class), mock(SearchResult.class), mock(SearchResult.class));
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
@@ -75,11 +75,11 @@ public class IMDBTest {
 
         verify(documentBuilder).buildDocument(commandCaptor.capture());
 
-        assertThat(commandCaptor.getValue() instanceof SearchTitleCommand, is(true));
-        assertThat(result, is(answer));
+        assertTrue(commandCaptor.getValue() instanceof SearchTitleCommand);
+        assertEquals(result, answer);
     }
 
-    @org.junit.Test
+    @Test
     public void testSearchWithFilter() throws IMDBException, IOException, ParseException {
         SearchResult first = mock(SearchResult.class);
         SearchResult second = mock(SearchResult.class);
@@ -96,8 +96,8 @@ public class IMDBTest {
         List<SearchResult> result = imdb.search("someQuery", predicate);
 
         verify(documentBuilder).buildDocument(commandCaptor.capture());
-        assertThat(commandCaptor.getValue() instanceof SearchTitleCommand, is(true));
-        assertThat(result, is((List<SearchResult>) Lists.newArrayList(first)));
+        assertTrue(commandCaptor.getValue() instanceof SearchTitleCommand);
+        assertEquals(result, Lists.newArrayList(first));
     }
 
     @Test
@@ -108,8 +108,8 @@ public class IMDBTest {
             imdb.search("someQuery");
             fail();
         } catch (IMDBException e) {
-            assertThat(e.getCause() instanceof IOException, is(true));
-            assertThat(e.getMessage(), is("Could not find movies for name 'someQuery'"));
+            assertTrue(e.getCause() instanceof IOException);
+            assertEquals(e.getMessage(), "Could not find movies for name 'someQuery'");
         }
     }
 
@@ -123,8 +123,8 @@ public class IMDBTest {
             imdb.search("someQuery");
             fail();
         } catch (IMDBException e) {
-            assertThat(e.getCause() instanceof ParseException, is(true));
-            assertThat(e.getMessage(), is("A parse exception occurred while searching movies for name 'someQuery'"));
+            assertTrue(e.getCause() instanceof ParseException);
+            assertEquals("A parse exception occurred while searching movies for name 'someQuery'", e.getMessage());
         }
     }
 
@@ -140,9 +140,9 @@ public class IMDBTest {
 
         verify(documentBuilder, times(2)).buildDocument(commandCaptor.capture());
 
-        assertThat(commandCaptor.getValue() instanceof TitleDetailsCommand, is(true));
-        assertThat(((TitleDetailsCommand) commandCaptor.getValue()).getId(), is("someId"));
-        assertThat(result, is(answer));
-
+        assertTrue(commandCaptor.getValue() instanceof TitleDetailsCommand);
+        assertEquals("someId", ((TitleDetailsCommand) commandCaptor.getValue()).getId());
+        assertEquals(result, answer);
     }
+
 }
