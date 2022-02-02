@@ -5,7 +5,7 @@
 
     <groupId>io.github.jimmyd-be</groupId>
     <artifactId>imdb-api</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
 
     <name>IMDb API</name>
     <description>This is a Java library which can be used to extract little pieces of information of the IMDb.
