@@ -32,7 +32,14 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
         List<String> genres = getGenres(document);
         LocalDate airDate = getAirDate(document);
 
-        return new TvEpisodeDetails(showName, episodeName, seasonNumber, episodeNumber, genres, airDate);
+        return new TvEpisodeDetails.Builder()
+                .withShowName(showName)
+                .withEpisodeName(episodeName)
+                .withSeasonNumber(seasonNumber)
+                .withEpisodeNumber(episodeNumber)
+                .withGenres(genres)
+                .withAirDate(airDate)
+                .build();
     }
 
     private LocalDate getAirDate(Element document) {

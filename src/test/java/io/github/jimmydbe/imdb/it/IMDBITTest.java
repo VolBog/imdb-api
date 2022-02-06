@@ -64,6 +64,7 @@ public class IMDBITTest {
         List<SearchResult> resultList = imdb.search("inglourious basterds", new MovieTypeFilter());
 
         assertEquals(3, resultList.size());
+
         assertTrue(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2009, "Movie", "https://m.media-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_UX32_CR0,0,32,44_AL_.jpg")));
         assertFalse(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2009, "Abc", "")));
         assertFalse(resultList.contains(new SearchResult("tt0361748", "Inglourious Basterds", 2008, "Movie", "")));

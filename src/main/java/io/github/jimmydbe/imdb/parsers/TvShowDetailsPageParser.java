@@ -40,7 +40,16 @@ public class TvShowDetailsPageParser implements Parser<TvShowDetails> {
         //Integer duration = getDuration(document);
         Set<String> genres = getGenres(document);
         Set<String> creators = getCreators(detailsDocument.get());
-        return new TvShowDetails(name, rating, startYear, endYear, genres, plot, creators);
+
+        return new TvShowDetails.Builder()
+                .withName(name)
+                .withRating(rating)
+                .withStartYear(startYear)
+                .withEndYear(endYear)
+                .withGenres(genres)
+                .withPlot(plot)
+                .withCreators(creators)
+                .build();
     }
 
     private Set<String> getCreators(Element document) {

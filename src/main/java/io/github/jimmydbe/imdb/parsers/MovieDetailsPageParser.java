@@ -46,7 +46,20 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
         List<String> categories = parseCategories(document);
         String image = parseImage(document);
         Integer duration = parseDuration(document);
-        return new MovieDetails(movieName, movieOriginalName, year, description, rating, directors, writers, stars, categories, image, duration);
+
+        return new MovieDetails.Builder()
+                .withMovieName(movieName)
+                .withMovieOriginalName(movieOriginalName)
+                .withYear(year)
+                .withDescription(description)
+                .withRating(rating)
+                .withDirectors(directors)
+                .withWriters(writers)
+                .withStars(stars)
+                .withCategories(categories)
+                .withImage(image)
+                .withDuration(duration)
+                .build();
     }
 
     private String parseMovieOriginalName(Element document) {

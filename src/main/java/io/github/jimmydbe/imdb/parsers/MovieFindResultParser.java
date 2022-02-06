@@ -1,7 +1,6 @@
 package io.github.jimmydbe.imdb.parsers;
 
 import io.github.jimmydbe.imdb.domain.SearchResult;
-import io.github.jimmydbe.imdb.domain.SearchResult.SearchResultBuilder;
 import io.github.jimmydbe.imdb.exceptions.ParseException;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,11 +11,11 @@ public class MovieFindResultParser implements Parser<SearchResult> {
 
     @Override
     public SearchResult parse(Element document, Optional<Element> detailsDocument) throws ParseException {
-        SearchResult.SearchResultBuilder builder = SearchResult.builder();
+        SearchResult.Builder builder = new SearchResult.Builder();
 
         String thumbnail = getPhotoResult(document);
         Element textResult = getTextResult(document);
-        builder.id(getMovieId(textResult)).name(getMovieName(textResult)).year(0).type("Movie").thumbnail(thumbnail);
+        builder.withId(getMovieId(textResult)).withName(getMovieName(textResult)).withYear(0).withType("Movie").withThumbnail(thumbnail);
         String metaInfo = getMetaInfo(textResult);
         setupMetaInfo(builder, metaInfo);
         return builder.build();
@@ -41,7 +40,7 @@ public class MovieFindResultParser implements Parser<SearchResult> {
         return href;
     }
 
-    private void setupMetaInfo(SearchResultBuilder builder, String metaInfo) {
+    private void setupMetaInfo(SearchResult.Builder builder, String metaInfo) {
         if (metaInfo.length() == 0) {
             return;
         }
@@ -55,12 +54,12 @@ public class MovieFindResultParser implements Parser<SearchResult> {
             if (components.length > compIndex) {
                 try {
                     int year = Integer.parseInt(components[compIndex]);
-                    builder.year(year);
+                    builder.withYear(year);
                     if (components.length > compIndex + 1) {
-                        builder.type(components[compIndex + 1]);
+                        builder.withType(components[compIndex + 1]);
                     }
                 } catch (NumberFormatException e) {
-                    builder.type(components[compIndex]);
+                    builder.withType(components[compIndex]);
                 }
             }
         }

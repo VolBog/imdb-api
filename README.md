@@ -33,10 +33,11 @@ TODO
 The module is available on the central Maven repository.
 
 ```xml
+
 <dependency>
-      <groupId>io.github.jimmyd-be</groupId>
-      <artifactId>imdb-api</artifactId>
-      <version>2.0.2</version>
+    <groupId>io.github.jimmyd-be</groupId>
+    <artifactId>imdb-api</artifactId>
+    <version>{latest-version}</version>
 </dependency>
 ```
 
