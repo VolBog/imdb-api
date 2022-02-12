@@ -1,6 +1,5 @@
 package io.github.jimmydbe.imdb;
 
-import com.google.common.collect.Lists;
 import io.github.jimmydbe.imdb.commands.Command;
 import io.github.jimmydbe.imdb.commands.SearchTitleCommand;
 import io.github.jimmydbe.imdb.commands.TitleDetailsCommand;
@@ -15,7 +14,6 @@ import io.github.jimmydbe.imdb.parsers.TvEpisodeDetailsPageParser;
 import io.github.jimmydbe.imdb.parsers.TvShowDetailsPageParser;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +24,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +68,7 @@ public class IMDBTest {
 
     @Test
     public void testSearch() throws IMDBException, IOException, ParseException {
-        List<SearchResult> answer = Lists.newArrayList(mock(SearchResult.class), mock(SearchResult.class), mock(SearchResult.class));
+        List<SearchResult> answer = Arrays.asList(mock(SearchResult.class), mock(SearchResult.class), mock(SearchResult.class));
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
         when(searchedMoviesParser.parse(document, Optional.empty())).thenReturn(answer);
         List<SearchResult> result = imdb.search("someQuery");
@@ -89,7 +89,7 @@ public class IMDBTest {
         when(predicate.accepts(first)).thenReturn(true);
         when(predicate.accepts(second)).thenReturn(false);
 
-        List<SearchResult> answer = Lists.newArrayList(first, second);
+        List<SearchResult> answer = Arrays.asList(first, second);
         when(documentBuilder.buildDocument(isA(Command.class))).thenReturn(document);
         when(searchedMoviesParser.parse(document, Optional.empty())).thenReturn(answer);
 
@@ -97,7 +97,7 @@ public class IMDBTest {
 
         verify(documentBuilder).buildDocument(commandCaptor.capture());
         assertTrue(commandCaptor.getValue() instanceof SearchTitleCommand);
-        assertEquals(result, Lists.newArrayList(first));
+        assertEquals(result, Collections.singletonList(first));
     }
 
     @Test
