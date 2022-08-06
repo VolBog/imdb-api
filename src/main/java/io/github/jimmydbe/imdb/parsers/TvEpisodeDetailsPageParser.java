@@ -5,6 +5,7 @@ import org.jsoup.nodes.Element;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -55,7 +56,9 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
         if (dateString.length() == 4) {
             return LocalDate.of(Integer.parseInt(dateString), 1, 1);
         }
-        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+        DateTimeFormatter f = new DateTimeFormatterBuilder().parseCaseInsensitive()
+                .append(DateTimeFormatter.ofPattern("MMM dd, yyyy")).toFormatter(Locale.ENGLISH);
+        return LocalDate.parse(dateString, f);
     }
 
     private List<String> getGenres(Element document) {
@@ -69,12 +72,16 @@ public class TvEpisodeDetailsPageParser implements Parser<TvEpisodeDetails> {
 
     private Long getEpisodeNumber(Element document) {
         String episodeInfo = document.select(properties.get(EPISODE_NUMBER).toString()).text();
+        String[] episodeInfoParts = episodeInfo.split("[.]");
+        episodeInfo = episodeInfoParts.length > 1 ? episodeInfoParts[1] : episodeInfo;
         return Long.parseLong(episodeInfo.replace("E", "").trim());
     }
 
     private Long getSeasonNumber(Element document) {
         String seasonInfo = document.select(properties.get(SEASON_NUMBER).toString()).text();
-        return Long.parseLong(seasonInfo.replace("S", "").trim());
+        seasonInfo = seasonInfo.replace("S", "").trim();
+        seasonInfo = seasonInfo.split("[.]")[0];
+        return Long.parseLong(seasonInfo);
     }
 
     private String getEpisodeName(Element document) {

@@ -113,11 +113,11 @@ public class MovieDetailsPageParser implements Parser<MovieDetails> {
     }
 
     private Double parseRating(Element document) {
-        //Elements elements = document.select(properties.get(RATING).toString());
-        Elements elements = document.select(".AggregateRatingButton__ContentWrap-sc-1ll29m0-0");
+        Elements elements = document.select(properties.get(RATING).toString());
+        //Elements elements = document.select(".AggregateRatingButton__ContentWrap-sc-1ll29m0-0");
         String value = elements.get(0).text().trim();
         if (value.length() > 0) {
-            return Double.parseDouble(value.substring(0, value.indexOf("/")));
+            return Double.parseDouble(value);
         } else {
             return null;
         }

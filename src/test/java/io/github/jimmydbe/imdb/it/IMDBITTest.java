@@ -109,7 +109,7 @@ public class IMDBITTest {
         assertEquals(Arrays.asList("Quentin Tarantino"), movieDetails.getWriters());
         assertTrue(movieDetails.getStars().contains("Brad Pitt"));
         assertEquals(Arrays.asList("Adventure", "Drama", "War"), movieDetails.getCategories());
-        assertEquals("https://m.media-amazon.com/images/M/MV5BOTJiNDEzOWYtMTVjOC00ZjlmLWE0NGMtZmE1OWVmZDQ2OWJhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_QL75_UX190_CR0,0,190,281_.jpg", movieDetails.getImage());
+        assertEquals("https://m.media-amazon.com/images/M/MV5BMjE3NDU2MTE3OV5BMl5BanBnXkFtZTgwNDM2OTM5NDE@._V1_QL75_UY281_CR6,0,190,281_.jpg", movieDetails.getImage());
     }
 
     @Test
